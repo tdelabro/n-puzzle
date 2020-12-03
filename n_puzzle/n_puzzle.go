@@ -99,7 +99,7 @@ func main() {
 	sFlag := flag.Int("s", 0, "Size of the map to generate")
 	iFlag := flag.Int("i", 100, "Number of random swap done during map generation")
 	flag.Parse()
-	if *sFlag <= 1 {
+	if *sFlag < 2 {
 		fmt.Printf("\033[1;31mSize must be at least 2\033[m\n")
 		return
 	}
