@@ -20,6 +20,8 @@ func getHeuristic(size int, heuristic string, state []int, goalState []int) int 
 		return LinearConflict(size, state, goalState)
 	} else if heuristic == "c" {
 		return CornerTiles(size, state, goalState)
+	} else if heuristic == "u" {
+		return 0
 	} else {
 		return Manhattan(size, state, goalState)
 	}

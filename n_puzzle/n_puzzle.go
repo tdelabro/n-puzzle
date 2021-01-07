@@ -94,7 +94,7 @@ func main() {
 	var size int
 	var err error
 
-	hFlag := flag.String("H", "m", "Pick one of the following heuristics:\nh	Hamming distance\nm	Manhattan distance\nl	Linear conflict + Manhattan\nc	Corner tiles + Linear conflict + Manhattan")
+	hFlag := flag.String("H", "m", "Pick one of the following heuristics:\nh	Hamming distance\nm	Manhattan distance\nl	Linear conflict + Manhattan\nc	Corner tiles + Linear conflict + Manhattan\nu\tUniform cost search (No heuristic)")
 	fFlag := flag.String("f", "", "File to read input from")
 	sFlag := flag.Int("s", 0, "Size of the map to generate")
 	iFlag := flag.Int("i", 100, "Number of random swap done during map generation")
