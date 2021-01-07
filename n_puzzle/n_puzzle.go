@@ -95,6 +95,7 @@ func main() {
 	var err error
 
 	hFlag := flag.String("H", "m", "Pick one of the following heuristics:\nh	Hamming distance\nm	Manhattan distance\nl	Linear conflict + Manhattan\nc	Corner tiles + Linear conflict + Manhattan\nu\tUniform cost search (No heuristic)")
+	gFlag := flag.String("g", "a", "Pick one of the following algorithms:\ng\tGreedy bfs search algorithm\na\tA* best search algorithm")
 	fFlag := flag.String("f", "", "File to read input from")
 	sFlag := flag.Int("s", 0, "Size of the map to generate")
 	iFlag := flag.Int("i", 100, "Number of random swap done during map generation")
@@ -121,6 +122,6 @@ func main() {
 		size = *sFlag
 		input = Shuffle(size, *iFlag, Generator(*sFlag))
 	}
-	Resolve(size, input, *hFlag)
+	Resolve(size, input, *hFlag, *gFlag)
 	return
 }

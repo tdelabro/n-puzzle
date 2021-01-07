@@ -11,6 +11,8 @@ type position struct {
 	prev      int
 }
 
+var algo string
+
 func getHeuristic(size int, heuristic string, state []int, goalState []int) int {
 	if heuristic == "h" {
 		return Hamming(size, state, goalState)
@@ -115,8 +117,13 @@ func createPosition(size int, heuristic string, state []int, goalState []int, co
 	var tmp position
 	tmp.state = make([]int, len(state))
 	copy(tmp.state, state)
-	tmp.cost = cost
-	tmp.heuristic = getHeuristic(size, heuristic, state, goalState) + cost
+	if (algo == "g") {
+		tmp.cost = 0
+		tmp.heuristic = getHeuristic(size, heuristic, state, goalState)
+	} else {
+		tmp.cost = cost
+		tmp.heuristic = getHeuristic(size, heuristic, state, goalState) + cost
+	}
 	tmp.prev = prev
 	return tmp
 }
@@ -142,11 +149,12 @@ func printTaquin(size int, state []int) {
 	fmt.Printf("\n\n")
 }
 
-func Resolve(size int, initialState []int, heuristic string) {
+func Resolve(size int, initialState []int, heuristic string, algorithm string) {
 	closedList := make([]position, 0, 1024)
 	openList := make([]position, 0, 1024)
 	goalState := Generator(size)
 	var pos position
+	algo = algorithm
 
 	if !IsSolvable(size, initialState, goalState) {
 		fmt.Println("Unsolvable puzzle")
