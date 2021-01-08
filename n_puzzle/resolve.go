@@ -8,7 +8,7 @@ type position struct {
 	state     []int
 	cost      int
 	heuristic int
-	prev      int
+	prev      *position
 }
 
 var algo string
@@ -49,11 +49,9 @@ func isSameState(s1 []int, s2 []int) bool {
 	return true
 }
 
-func insertInOpenList(openList []position, closeList []position, pos position) []position {
-	for i := len(closeList) - 1; i >= 0; i-- {
-		if isSameState(pos.state, closeList[i].state) {
-			return openList
-		}
+func insertInOpenList(openList []position, closeList node, pos position) []position {
+    if closeList.stateAlreadyExist(pos.state) {
+    	return openList
 	}
 	l := -1
 	for i := len(openList) - 1; i >= 0; i-- {
@@ -76,9 +74,8 @@ func insertInOpenList(openList []position, closeList []position, pos position) [
 	}
 }
 
-func visitPosition(size int, heuristic string, goalState []int, pos position, openList []position, closedList []position) []position {
+func visitPosition(size int, heuristic string, goalState []int, pos position, openList []position, closedList node) []position {
 	zeroIndex := getZeroIndex(pos.state)
-	indexPrevPos := len(closedList) - 1
 
 	state := make([]int, len(pos.state))
 	var newPos position
@@ -86,34 +83,34 @@ func visitPosition(size int, heuristic string, goalState []int, pos position, op
 		copy(state, pos.state)
 		state[zeroIndex] = state[zeroIndex-size]
 		state[zeroIndex-size] = 0
-		newPos = createPosition(size, heuristic, state, goalState, pos.cost+1, indexPrevPos)
+		newPos = createPosition(size, heuristic, state, goalState, pos.cost+1, &pos)
 		openList = insertInOpenList(openList, closedList, newPos)
 	}
 	if zeroIndex/size < size-1 {
 		copy(state, pos.state)
 		state[zeroIndex] = state[zeroIndex+size]
 		state[zeroIndex+size] = 0
-		newPos = createPosition(size, heuristic, state, goalState, pos.cost+1, indexPrevPos)
+		newPos = createPosition(size, heuristic, state, goalState, pos.cost+1, &pos)
 		openList = insertInOpenList(openList, closedList, newPos)
 	}
 	if zeroIndex%size > 0 {
 		copy(state, pos.state)
 		state[zeroIndex] = state[zeroIndex-1]
 		state[zeroIndex-1] = 0
-		newPos = createPosition(size, heuristic, state, goalState, pos.cost+1, indexPrevPos)
+		newPos = createPosition(size, heuristic, state, goalState, pos.cost+1, &pos)
 		openList = insertInOpenList(openList, closedList, newPos)
 	}
 	if zeroIndex%size < size-1 {
 		copy(state, pos.state)
 		state[zeroIndex] = state[zeroIndex+1]
 		state[zeroIndex+1] = 0
-		newPos = createPosition(size, heuristic, state, goalState, pos.cost+1, indexPrevPos)
+		newPos = createPosition(size, heuristic, state, goalState, pos.cost+1, &pos)
 		openList = insertInOpenList(openList, closedList, newPos)
 	}
 	return openList
 }
 
-func createPosition(size int, heuristic string, state []int, goalState []int, cost int, prev int) position {
+func createPosition(size int, heuristic string, state []int, goalState []int, cost int, prev *position) position {
 	var tmp position
 	tmp.state = make([]int, len(state))
 	copy(tmp.state, state)
@@ -128,10 +125,10 @@ func createPosition(size int, heuristic string, state []int, goalState []int, co
 	return tmp
 }
 
-func rewind(size int, pos position, closedList []position) int {
+func rewind(size int, pos position, closedList node) int {
 	var ret int
-	if pos.prev >= 0 {
-		ret = rewind(size, closedList[pos.prev], closedList) + 1
+	if pos.prev != nil {
+		ret = rewind(size, *pos.prev, closedList) + 1
 	} else {
 		ret = 0
 	}
@@ -150,7 +147,10 @@ func printTaquin(size int, state []int) {
 }
 
 func Resolve(size int, initialState []int, heuristic string, algorithm string) {
-	closedList := make([]position, 0, 1024)
+	closedList := node{
+		value: -1,
+		child: make([]*node, 0, 1024),
+	}
 	openList := make([]position, 0, 1024)
 	goalState := Generator(size)
 	var pos position
@@ -160,16 +160,16 @@ func Resolve(size int, initialState []int, heuristic string, algorithm string) {
 		fmt.Println("Unsolvable puzzle")
 		return
 	}
-	start := createPosition(size, heuristic, initialState, goalState, 0, -1)
+	start := createPosition(size, heuristic, initialState, goalState, 0, nil)
 	openList = append(openList, start)
 	for len(openList) != 0 {
 		pos = openList[len(openList)-1]
 		openList = openList[:len(openList)-1]
-		closedList = append(closedList, pos)
+		closedList.insertState(pos.state)
 		if isSameState(pos.state, goalState) {
 			n_moves := rewind(size, pos, closedList)
-			fmt.Printf("Time complexity: %d\n", len(closedList))
-			fmt.Printf("Size complexity: %d\n", len(closedList)+len(openList))
+		//	fmt.Printf("Time complexity: %d\n", len(closedList))
+		//	fmt.Printf("Size complexity: %d\n", len(closedList)+len(openList))
 			fmt.Printf("Number of moves: %d\n", n_moves)
 			return
 		}
