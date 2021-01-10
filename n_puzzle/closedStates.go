@@ -1,8 +1,7 @@
 package main
 
 type node struct {
-    value int
-    child []*node
+    child map[int]*node
 }
 
 func (n *node) insertState(state []int) {
@@ -12,20 +11,18 @@ func (n *node) insertState(state []int) {
             current = pNode
         } else {
             tmp := &node{
-                value: state[i],
-                child: make([]*node, 0),
+                child: make(map[int]*node, 0),
             }
-            current.child = append(current.child, tmp)
+            current.child[state[i]] = tmp
             current = tmp
         }
     }
 }
 
-func findNodeContainingValInChilds(val int, childs []*node) *node {
-    for i := 0; i < len(childs); i++ {
-        if (*childs[i]).value == val {
-            return childs[i]
-        }
+func findNodeContainingValInChilds(val int, childs map[int]*node) *node {
+    n, ok := childs[val]
+    if ok {
+        return n
     }
 
     return nil

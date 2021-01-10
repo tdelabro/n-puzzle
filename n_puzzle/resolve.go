@@ -148,8 +148,7 @@ func printTaquin(size int, state []int) {
 
 func Resolve(size int, initialState []int, heuristic string, algorithm string) {
 	closedList := node{
-		value: -1,
-		child: make([]*node, 0, 1024),
+		child: make(map[int]*node, size*size),
 	}
 	openList := make([]position, 0, 1024)
 	goalState := Generator(size)
@@ -160,16 +159,19 @@ func Resolve(size int, initialState []int, heuristic string, algorithm string) {
 		fmt.Println("Unsolvable puzzle")
 		return
 	}
+
+	closedCounter := 0
 	start := createPosition(size, heuristic, initialState, goalState, 0, nil)
 	openList = append(openList, start)
 	for len(openList) != 0 {
 		pos = openList[len(openList)-1]
 		openList = openList[:len(openList)-1]
 		closedList.insertState(pos.state)
+		closedCounter++
 		if isSameState(pos.state, goalState) {
 			n_moves := rewind(size, pos, closedList)
-		//	fmt.Printf("Time complexity: %d\n", len(closedList))
-		//	fmt.Printf("Size complexity: %d\n", len(closedList)+len(openList))
+			fmt.Printf("Time complexity: %d\n", closedCounter)
+			fmt.Printf("Size complexity: %d\n", closedCounter+len(openList))
 			fmt.Printf("Number of moves: %d\n", n_moves)
 			return
 		}
