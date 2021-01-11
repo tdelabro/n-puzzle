@@ -13,3 +13,5 @@ build:
 clean:
 	$(GOCLEAN)
 	rm $(TARGET)
+
+re: clean build
