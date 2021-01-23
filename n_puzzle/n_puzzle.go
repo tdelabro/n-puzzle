@@ -13,7 +13,7 @@ import (
 var Size int
 var GoalState []int
 
-func readFile(name string) ([]int, int, error) {
+func readFile(name string) (_ []int, _ int, ers error) {
 	file, err := os.Open(name)
 	if err != nil {
 		return nil, 0, errors.New("No such file or directory")
@@ -23,6 +23,12 @@ func readFile(name string) ([]int, int, error) {
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 	scanner.Scan()
+
+	defer func() {
+		if (recover() != nil) {
+			ers = errors.New("Puzzle should not cointains an empty line")
+		}
+	}()
 
 	for strings.Trim(scanner.Text(), "\n \t")[0] == '#' {
 		scanner.Scan()
